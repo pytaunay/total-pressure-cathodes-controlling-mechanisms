@@ -132,6 +132,9 @@ for k in range(ntry):
 # Create a dataframe out of the list of dictionaries
 df = pd.DataFrame(ldic,columns=range(len(Ytrain)))
 
+########################################
+############ OUTPUT INFO ###############
+########################################
 ### Plot data with bootstrapped error bounds on the Y prediction
 onetone = np.logspace(0,5,100)
 plt.loglog(onetone,onetone,'k--')
@@ -156,7 +159,16 @@ for k in range(ntry):
 se_arr /= ntry-1
 se_arr = np.sqrt(se_arr)
 
-print(se_arr)
-print(main_coeff + se_arr)
-print(main_coeff - se_arr)
 
+print("---------------")
+print("Boostrapped coefficient C in PI1 = C PI5")
+print("Lower bound, Value, Upper bound","Error")
+Cexp = np.mean(all_coeff)
+print(Cexp-se_arr,Cexp,Cexp + se_arr,se_arr)
+
+print("---------------")
+print("STATISTICS: R2 AND AVERAGE ERROR")
+print("R^2 \t Average error (%)")
+print(np.mean(r2_all),np.mean(ave_err_all))
+
+    
