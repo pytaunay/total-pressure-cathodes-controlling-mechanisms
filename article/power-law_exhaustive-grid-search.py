@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 '''
-File: exhaustive_grid_search.py
+File: power-law_exhaustive-grid-search.py
 Date: August, 2021
 Author: Pierre-Yves Taunay
 
