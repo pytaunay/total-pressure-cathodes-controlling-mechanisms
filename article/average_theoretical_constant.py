@@ -75,12 +75,14 @@ for kk,val in enumerate(
 # Plot distribution of values
 _ = plt.hist(Cvec,bins=50)
 
-# Compute the mean and 5%-95% values
+# Compute the mean, min, max
 tdf = pd.DataFrame(Cvec).describe(percentiles=[0.05,0.95])
 
 Ctheory = tdf.loc['mean'][0]
 Cmin = tdf.loc['min'][0]
 Cmax = tdf.loc['max'][0]
+
+# Print results
 print("Lower bound, Theoretical value, Upper bound")
 print(Cmin,Ctheory,Cmax)
 print("Delta-min, Delta-max")
