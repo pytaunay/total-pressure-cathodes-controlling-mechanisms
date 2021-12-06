@@ -20,14 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 '''
-File: linear_regression_bootstrap.py
+File: power-law_boostrap.py
 Date: July, 2021
 Author: Pierre-Yves Taunay
 Description: Performs a bootstrap analysis to find the 95% confidence intervals for:
     1. each predicted value for the linear regression, and
     2. each coefficient for the linear regression.
-In the associated journal article the bounds on the coefficients are found through the covariance
-matrix.
+Recreates Figure 5a. in the associated journal article. The error bounds on the coefficients are 
+slightly different from the ones that are found through the covariance matrix.
+The bootstrap confidence intervals are smaller than ones obtained with the covariance matrix.
 '''
 import numpy as np
 import pandas as pd
@@ -131,21 +132,41 @@ for k in range(ntry):
 # Create a dataframe out of the list of dictionaries
 df = pd.DataFrame(ldic,columns=range(len(Ytrain)))
 
+########################################
+########### OUTPUT RESULTS #############
+########################################
 ### Plot data with bootstrapped error bounds on the Y prediction
+# Perfect correlation
 onetone = np.logspace(0,5,100)
 plt.loglog(onetone,onetone,'k--')
 
+# Get error bars and average value
 desc = df.describe(percentiles=[0.05,0.95])
 sdesc = desc.sort_values(by='mean',axis=1)
 
+# Plot error bars
 plt.errorbar(desc.loc['mean'],
              pidata['PI1'],
                   xerr =np.array([
                           desc.loc['mean']-desc.loc['5%'],
-                          desc.loc['95%']-desc.loc['mean']]),fmt='ko')
+                          desc.loc['95%']-desc.loc['mean']]),fmt='ko',markerfacecolor='none',
+                        markeredgecolor='none',ms=5)
+# Plot by color of Pi5 (Fig. 5a)
+plt.scatter(desc.loc['mean'],
+             pidata['PI1'],
+             s = 40,
+                  c=np.log10(pidata['PI5']))
 
-### Get the bootstraped error for the coefficients
-df = pd.DataFrame(all_coeff)
+cbar = plt.colorbar()
+
+# Labels
+cbar.ax.set_ylabel("$\log_10 \Pi_5$")    
+plt.xlabel("$\Gamma (\Pi)$")
+plt.ylabel("$\Pi_1$")
+    
+    
+### Get the bootstraped error for the coefficients (similar to Table II)
+err_df = pd.DataFrame(all_coeff)
 
 # Standard error
 se_arr = np.zeros(len(main_coeff))
