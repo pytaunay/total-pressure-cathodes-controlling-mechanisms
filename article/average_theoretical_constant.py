@@ -33,11 +33,12 @@ depends are sampled over a relevant range:
 The reported value in the article is 2.56 +/- [0.67,0.55].
 '''
 import numpy as np
-import cathode.constants as cc
 import matplotlib.pyplot as plt
 import pandas as pd
 
 from itertools import product
+
+Kelvin2eV = 8.617333262145179e-05
 
 def static_term(Kn,gam):
     '''
@@ -57,7 +58,7 @@ gam = 5./3.
 # Parameter space
 alpha_o = np.linspace(0.01,0.1,npoints) # Orifice ionization fraction
 Te_o = np.linspace(2,5,npoints) # Orifice electron temperature
-Tn = np.linspace(2000,4000,npoints) * cc.Kelvin2eV # Neutral static temperature
+Tn = np.linspace(2000,4000,npoints) * Kelvin2eV # Neutral static temperature
 Kn_o = np.linspace(0.1,10,npoints)
 
 # Function of gamma and KNudsen number
