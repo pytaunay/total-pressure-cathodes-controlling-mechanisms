@@ -188,6 +188,8 @@ print("=============Capacci fit =============")
 print("MSE, R2")
 print(mean_squared_error(y,Yp),r2_score(y,Yp))
 print("Average error:" , np.mean( np.abs((10**Yp-10**y)/10**y)*100))
+print("Parameters")
+print(cap_fit.params)
 
 plt.loglog(10**Yp,10**y,'kx')
 
