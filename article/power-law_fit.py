@@ -25,7 +25,7 @@ Author: Pierre-Yves Taunay
 Date: August, 2021
 Description: performs the power law fit.
 
-Recreates Table II, Figs 5a (w/o error bars or gray scale), and 5b in "Total pressure in 
+Recreates Table II, Figs 5a (w/o error bars or gray scale), 5b, and 6 in "Total pressure in 
 thermionic orificed hollow cathodes"
 """
 import numpy as np
@@ -34,7 +34,8 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.linear_model import LinearRegression
-
+from sklearn.neighbors import KernelDensity
+from sklearn.model_selection import GridSearchCV
 
 ########################################
 ############# GET DATA #################
@@ -62,31 +63,12 @@ Xreg = np.array([X0,X1,X2,X3,X4,X5,X6]).T
 ### Perform regression
 reg = LinearRegression()
 reg.fit(Xreg,Y)
+Yp = reg.predict(Xreg) # Predicted Y
 
 # Store data
 coef = np.copy(reg.coef_)
 coef[0] = np.copy(reg.intercept_)
 
-########################################
-######### COEFFICIENT ERROR ############
-########################################
-### 95% Confidence intervals
-Yp = reg.predict(Xreg) # Predicted Y
-mse = mean_squared_error(Y,Yp)
-r2 = r2_score(Y,Yp)
-
-# Covariance matrix
-Ainv = mse * np.linalg.inv(Xreg.T@Xreg)
-
-# Compute interval
-# see, e.g., G. James, et al., "An Introduction to Statistical Learning," 2017. p.66
-# or https://stats.stackexchange.com/questions/136157/general-mathematics-for-confidence-interval-in-multiple-linear-regression
-vals = 1.96 * np.sqrt(np.diag(Ainv))
-
-
-########################################
-########### OUTPUT RESULTS #############
-########################################
 ### Plot by cathode: Fig. 5b
 plt.figure()
 for name in np.unique(data[['cathode']]):
@@ -143,12 +125,38 @@ plt.legend(["AR3","EK6","Friedly","JPL 1.5cm","","","NEXIS","NSTAR","PLHC","SC01
             "Salhi-Ar","","Salhi-Xe","Siegfried (Hg)","Siegfried (Ar, Xe)","T6"])
 plt.xlabel("$\Gamma (\Pi)$")
 plt.ylabel("$\Pi_1$")
-
+plt.title("Figure 5b: Proposed power law (Equation 37) applied to the entire data set")
     
 # Perfect correlation
 onetone = np.logspace(0,5,100)
 plt.loglog(onetone,onetone,'k--')
 
+
+#### Plot the regression w/o error bars or colors 
+plt.figure()
+plt.loglog(10**Yp,10**Y,'ko',markerfacecolor='none')
+plt.legend(["Power law fit"])
+plt.xlabel("$\Gamma (\Pi)$")
+plt.ylabel("$\Pi_1$")
+
+# Perfect correlation
+onetone = np.logspace(0,5,100)
+plt.loglog(onetone,onetone,'k--')
+
+########################################
+######### COEFFICIENT ERROR ############
+########################################
+### 95% Confidence intervals
+mse = mean_squared_error(Y,Yp)
+r2 = r2_score(Y,Yp)
+
+# Covariance matrix
+Ainv = mse * np.linalg.inv(Xreg.T@Xreg)
+
+# Compute interval
+# see, e.g., G. James, et al., "An Introduction to Statistical Learning," 2017. p.66
+# or https://stats.stackexchange.com/questions/136157/general-mathematics-for-confidence-interval-in-multiple-linear-regression
+vals = 1.96 * np.sqrt(np.diag(Ainv))
 
 ### Coefficient error
 # Recreate Table II
@@ -163,15 +171,37 @@ for c, e in zip(coef, vals):
         idx = idx + 1
     
     print(pi_str,":",f'{c-e:.3}',f'{c:.3}',f'{c+e:.3}')
-        
-#### Plot the regression w/o error bars or colors 
+
+########################################
+########## ERROR HISTOGRAM #############
+########################################
+### Pressure error
+vec_err = np.abs(10**Yp - 10**Y)/10**Y * 100
+
+### Kernel density of pressure error
+# Calculate best kernel density bandwidth
+bandwidths = 10 ** np.linspace(0, 1, 200)
+grid = GridSearchCV(KernelDensity(kernel='gaussian'),
+                    {'bandwidth': bandwidths},
+                    cv=5,
+                    verbose = 1)
+grid.fit(vec_err[:,None])
+
+print('Best params:',grid.best_params_)
+
+# Instantiate and fit the KDE model
+print("Instantiate and fit the KDE model")
+kde = KernelDensity(bandwidth=grid.best_params_['bandwidth'], 
+                    kernel='gaussian')
+kde.fit(vec_err[:,None])
+# Score_samples returns the log of the probability density
+x_d = np.linspace(0,100,1000)
+logprob = kde.score_samples(x_d[:,None])
 plt.figure()
-plt.loglog(10**Yp,10**Y,'ko',markerfacecolor='none')
-plt.legend(["Power law fit"])
-plt.xlabel("$\Gamma (\Pi)$")
-plt.ylabel("$\Pi_1$")
+plt.plot(x_d,np.exp(logprob),'k-')
+plt.fill_between(x_d,np.exp(logprob),color='tab:gray')
+_ = plt.hist(vec_err,bins=40,normed=True,histtype='step',color='k')
 
-# Perfect correlation
-onetone = np.logspace(0,5,100)
-plt.loglog(onetone,onetone,'k--')
-
+plt.title("Figure 6: Pressure error histogram and KDE")
+plt.xlabel("Pressure error (%)")
+plt.ylabel("Counts (a.u.)")  
