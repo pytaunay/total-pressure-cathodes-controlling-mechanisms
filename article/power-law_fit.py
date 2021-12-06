@@ -25,7 +25,7 @@ Author: Pierre-Yves Taunay
 Date: August, 2021
 Description: performs the power law fit.
 
-Recreates Table II, Figs 5a (w/o error bars or gray scale), 5b, and 6 in "Total pressure in 
+Recreates Table II, Figs 5a (w/o error bars or gray scale), 5b, 6, 7 in "Total pressure in 
 thermionic orificed hollow cathodes"
 """
 import numpy as np
