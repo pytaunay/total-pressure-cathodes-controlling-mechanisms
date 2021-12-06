@@ -159,8 +159,7 @@ Ainv = mse * np.linalg.inv(Xreg.T@Xreg)
 # or https://stats.stackexchange.com/questions/136157/general-mathematics-for-confidence-interval-in-multiple-linear-regression
 vals = 1.96 * np.sqrt(np.diag(Ainv))
 
-### Coefficient error
-# Recreate Table II
+### Coefficient error: Table II
 print("Pi-product","Lower bound","Value","Upper bound")
 idx = 0
 for c, e in zip(coef, vals):
@@ -198,6 +197,8 @@ kde.fit(vec_err[:,None])
 # Score_samples returns the log of the probability density
 x_d = np.linspace(0,100,1000)
 logprob = kde.score_samples(x_d[:,None])
+
+# Plot: Figure 6
 plt.figure()
 plt.plot(x_d,np.exp(logprob),'k-')
 plt.fill_between(x_d,np.exp(logprob),color='tab:gray')
@@ -216,6 +217,8 @@ X_train = np.array(np.log10(pidata))[:,1::]
 pca = PCA(n_components=6)
 pca.fit(X_train)
 cumsum = np.cumsum(pca.explained_variance_ratio_)
+
+# Plot: Figure 7
 plt.figure()
 plt.plot(np.arange(1,7,1),cumsum,'ko')
 plt.title("Figure 7: Principal Component Analysis")
