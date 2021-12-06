@@ -39,7 +39,7 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator
 from sklearn.metrics import mean_squared_error, r2_score
 
-class CrossValidationEstimator(BaseEstimator):
+class ExhaustiveGridSearchEstimator(BaseEstimator):
     def __init__(self, m2=True, m3=True, m4=True, m5=True, m6=True, m7=True):
         super().__init__()
         self.params_ = None
@@ -133,8 +133,9 @@ parameters = {
         'm7':[True,False]
         }
 
+# Include k-fold with k = 10
 clf = GridSearchCV(
-        CrossValidationEstimator(),
+        ExhaustiveGridSearchEstimator(),
         parameters,
         cv=KFold(n_splits=10,shuffle=True)
         )
