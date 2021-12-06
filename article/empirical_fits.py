@@ -119,7 +119,7 @@ Yp = fun_sw(X[:,0],X[:,1],X[:,2],X[:,3],
 print("=============S and W fit =============")
 print("MSE, R2")
 print(mean_squared_error(y,Yp),r2_score(y,Yp))
-print("Average error:" ,np.mean( np.abs((10**Yp-10**y)/10**y)*100))
+print("Average error (%):" ,np.mean( np.abs((10**Yp-10**y)/10**y)*100))
 print("Parameters")
 print(sw_fit.params)
 
@@ -187,7 +187,7 @@ Yp = fun_cap(X[:,0],X[:,1],X[:,2],X[:,3],
 print("=============Capacci fit =============")
 print("MSE, R2")
 print(mean_squared_error(y,Yp),r2_score(y,Yp))
-print("Average error:" , np.mean( np.abs((10**Yp-10**y)/10**y)*100))
+print("Average error (%):" , np.mean( np.abs((10**Yp-10**y)/10**y)*100))
 print("Parameters")
 print(cap_fit.params)
 
@@ -266,7 +266,7 @@ Yp = fun_pat(X[:,0],X[:,1],X[:,2],
 print("=============Patterson fit =============")
 print("MSE, R2")
 print(mean_squared_error(y,Yp),r2_score(y,Yp))
-print("Average error:" , np.mean( np.abs((10**Yp-10**y)/10**y)*100))
+print("Average error (%):" , np.mean( np.abs((10**Yp-10**y)/10**y)*100))
 
 print("Parameters")
 print(pat_fit.params)

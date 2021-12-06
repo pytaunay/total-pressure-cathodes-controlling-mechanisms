@@ -89,7 +89,7 @@ plt.loglog(10**Yp,10**Y,'k^',markerfacecolor='none')
 
 print("---------------")
 print("STATISTICS: R2 AND AVERAGE ERROR")
-print("Model\t R^2 \t Average error")
+print("Model\t R^2 \t Average error (%)")
 for r,e,m in zip(R2,ave_err,model_list):
     print(m,r,e)
 
