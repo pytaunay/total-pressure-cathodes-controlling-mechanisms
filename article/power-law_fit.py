@@ -160,6 +160,7 @@ Ainv = mse * np.linalg.inv(Xreg.T@Xreg)
 vals = 1.96 * np.sqrt(np.diag(Ainv))
 
 ### Coefficient error: Table II
+print("---------------")
 print("Pi-product","Lower bound","Value","Upper bound")
 idx = 0
 for c, e in zip(coef, vals):
@@ -177,6 +178,12 @@ for c, e in zip(coef, vals):
 ########################################
 ### Pressure error
 vec_err = np.abs(10**Yp - 10**Y)/10**Y * 100
+
+print("---------------")
+print("STATISTICS: R2 AND AVERAGE ERROR")
+print("Model\t R^2 \t Average error (%)")
+print("Power law:", r2, np.mean(np.abs(10**Yp - 10**Y)/10**Y * 100))
+print("---------------")
 
 ### Kernel density of pressure error
 # Calculate best kernel density bandwidth
