@@ -36,6 +36,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
+from sklearn.decomposition import PCA
 
 ########################################
 ############# GET DATA #################
@@ -205,3 +206,20 @@ _ = plt.hist(vec_err,bins=40,normed=True,histtype='step',color='k')
 plt.title("Figure 6: Pressure error histogram and KDE")
 plt.xlabel("Pressure error (%)")
 plt.ylabel("Counts (a.u.)")  
+
+########################################
+##### PRINCIPAL COMPONENT ANALYSIS #####
+########################################
+# Based on PI2 through PI7
+# Use log10 to decrease variation (e.g. PI4 ~ 1e14 vs. PI7 ~ 1e0)
+X_train = np.array(np.log10(pidata))[:,1::]
+pca = PCA(n_components=6)
+pca.fit(X_train)
+cumsum = np.cumsum(pca.explained_variance_ratio_)
+plt.figure()
+plt.plot(np.arange(1,7,1),cumsum,'ko')
+plt.title("Figure 7: Principal Component Analysis")
+plt.xlabel("Dimensions")
+plt.ylabel("Explained variance")
+
+
