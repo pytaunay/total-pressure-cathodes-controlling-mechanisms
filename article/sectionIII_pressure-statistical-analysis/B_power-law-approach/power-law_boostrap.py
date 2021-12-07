@@ -28,7 +28,7 @@ Description: Performs a bootstrap analysis to find the 95% confidence intervals 
     2. each coefficient for the linear regression.
 Recreates Figure 5a. in the associated journal article. The error bounds on the coefficients are 
 slightly different from the ones that are found through the covariance matrix.
-The bootstrap confidence intervals are smaller than ones obtained with the covariance matrix.
+The bootstrap confidence intervals are smaller than the ones obtained with the covariance matrix.
 '''
 import numpy as np
 import pandas as pd
@@ -73,7 +73,7 @@ Yp_main = main_reg.predict(np.log10(Xtrain))
 ############# BOOTSTRAP ################
 ########################################
 nsamples = len(Ytrain)
-ntry = 1000
+ntry = 50000
 
 # Placeholders for the coefficients to be found and the predicted y values
 all_coeff = np.zeros((ntry,len(main_coeff)))
