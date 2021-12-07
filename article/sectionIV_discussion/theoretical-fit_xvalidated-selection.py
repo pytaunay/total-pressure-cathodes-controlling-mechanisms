@@ -123,7 +123,7 @@ def build_initial_conditions(pidata,nc):
 ########################################
 ############# GET DATA #################
 ########################################
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../data/cathode_database.h5",key="data")
 
 ### Grab the Pi products
 pidata = data[['PI1','PI2','PI3','PI4','PI5','PI6','PI7']].dropna()
@@ -139,7 +139,13 @@ Xtrain = pidata[['PI2','PI3','PI4','PI5','PI6']]
 ##### CROSS-VALIDATION PARAMETERS ######
 ########################################
 # Get the scaling factor as computed from theory
-scaling_factor = pd.read_csv("cvec.csv")
+scaling_factor = pd.DataFrame()
+try:
+    scaling_factor = pd.read_csv("cvec.csv")
+except:
+    print("Exception when reading cvec.csv. Have you run average_theoretical_constant.py?")
+    raise
+
 cmin = scaling_factor.min()['scaling_factor']
 cmax = scaling_factor.max()['scaling_factor']
 
@@ -150,11 +156,11 @@ icdf = build_initial_conditions(pidata,nc)
 print("=========================")
 print("CROSS VALIDATION")
 parameters = {
-        'm2':[True],
-        'm3':[True],
-        'm4':[True],
-        'm5':[False],
-        'm6':[True],
+        'm2':[True,False],
+        'm3':[True,False],
+        'm4':[True,False],
+        'm5':[True,False],
+        'm6':[True,False],
         'icidx': np.arange(nc)
         }
 
