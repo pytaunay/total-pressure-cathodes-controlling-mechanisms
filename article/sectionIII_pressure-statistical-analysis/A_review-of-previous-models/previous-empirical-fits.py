@@ -286,3 +286,5 @@ plt.ylabel("$\Pi_1$")
 # Perfect correlation
 onetone = np.logspace(0,5,100)
 plt.loglog(onetone,onetone,'k--')
+
+plt.show()
