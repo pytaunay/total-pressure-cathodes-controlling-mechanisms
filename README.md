@@ -16,23 +16,29 @@ under a CC-BY-4.0 license.
 
 #### Re-creating numerical results
 To re-create the numerical results, run the scripts that are located in the ./article folder. 
+Scripts are provided by paper section. 
 A docstring is provided at the top of each script (below the license) to provide more context. 
-The scripts may be run natively or through the provided [Singularity](https://sylabs.io/) container.
+The scripts may be run directly on a given machine or through the provided 
+[Singularity](https://sylabs.io/) container.
 
 ##### Container 
 To ensure reproducibility, a Singularity container is also provided to run the examples.
-The container must be built first:
+The container must first be built:
 
 ```bash
-cd ./article
+cd ./container
+# If you do not have root access...
 singularity build --fakeroot singularity.sif singularity.def
+# ...Or if you do
+sudo singularity build singularity.sif singularity.def
 ```
 
-The environment is setup and the required Python packages are downloaded. The Python scripts can 
-then be run directly
+The container environment is now setup and the required Python packages are downloaded. The Python 
+scripts can then be run through the container 
 
 ```bash
-singularity exec singularity.sif python3 power-law_fit.py
+cd ../article/sectionIII_pressure-statistical-analysis/B_power-law-approach/
+singularity exec ../../../container/singularity.sif python3 power-law_fit.py
 ``` 
 
 ---
