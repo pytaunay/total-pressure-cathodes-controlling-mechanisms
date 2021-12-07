@@ -47,7 +47,8 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator
 from sklearn.metrics import mean_squared_error, r2_score
 
-from lmfit import Model, Parameters
+
+from lmfit import Model, Parameters, fit_report
 
 from sympy import lambdify
 from sympy.parsing.sympy_parser import parse_expr
@@ -186,7 +187,7 @@ class TheoryModelEstimator(BaseEstimator):
         self.fit_model_ = Model(fun, 
                                 independent_vars=lambvar,
                                 param_names=lambcoeff,
-                                nan_policy='propagate')
+                                nan_policy='omit')
         
         ##############################
         ### Perform the fit
@@ -352,13 +353,6 @@ Xtrain = pidata[['PI2','PI3','PI4','PI5','PI6']]
 ########################################
 ##### CROSS-VALIDATION PARAMETERS ######
 ########################################
-### Randomize starting points
-b0 = np.ones(7)
-b1 = np.ones(7)
-b1[0] = 4.0
-
-pall = [b0,b1]
-
 # Get the scaling factor as computed from theory
 scaling_factor = pd.read_csv("cvec.csv")
 cmin = scaling_factor.min()['scaling_factor']
@@ -366,16 +360,16 @@ cmax = scaling_factor.max()['scaling_factor']
 
 nc = 20
 
-icdf = build_initial_conditions(pidata,nc)
+#icdf = build_initial_conditions(pidata,nc)
 
 print("=========================")
 print("CROSS VALIDATION")
 parameters = {
-        'm2':[True,False],
-        'm3':[True,False],
-        'm4':[True,False],
-        'm5':[True,False],
-        'm6':[True,False],
+        'm2':[True],
+        'm3':[True],
+        'm4':[True],
+        'm5':[False],
+        'm6':[True],
         'icidx': np.arange(nc)
         }
 
@@ -394,6 +388,16 @@ clf.fit(Xtrain,Ytrain)
 
 print("Best AIC score:", clf.best_score_)
 print("Best parameters:",clf.best_params_)
+# Note: clf.best_estimator.params_ does not correspond to the "best" parameters as determined 
+# by LMFIT; rather, it is the last tested set of parameters.
+
+print("=========================")
+print("FIT REPORT")
+warn_str = "/!\ The error bounds on the variables are not to be trusted! "
+warn_str += "LMFIT computes them in an unreliable way for non-linear fits. "
+warn_str += "Use the bootstrap method to evaluate the bounds of those parameters instead. /!\ "
+print(warn_str)
+print(fit_report(clf.best_estimator_.fit_))
 
 ########################################
 ############ OUTPUT INFO ###############
