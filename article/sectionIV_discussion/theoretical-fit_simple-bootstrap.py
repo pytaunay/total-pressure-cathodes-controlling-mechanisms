@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 '''
-File: theory_simple_bootstrap.py
+File: theoretical-fit_simple-bootstrap.py
 Date: July, 2021
 Author: Pierre-Yves Taunay
 Description: Performs a bootstrap analysis to find the 95% confidence intervals for the constant
@@ -67,7 +67,9 @@ main_coeff = [*main_reg.coef_]
 main_coeff = np.array(main_coeff)
 
 # Predicted values of Y
-Yp_main = main_reg.predict(np.log10(Xtrain))
+Yp_main = main_reg.predict(Xtrain)
+Y_main = np.copy(Ytrain)
+X_main = np.copy(Xtrain)
 
 ########################################
 ############# BOOTSTRAP ################
@@ -151,21 +153,15 @@ plt.errorbar(desc.loc['mean'],
 
 ### Get the bootstraped error for the coefficients
 df = pd.DataFrame(all_coeff)
-
-# Standard error
-se_arr = np.zeros(len(main_coeff))
-for k in range(ntry):
-    ser = all_coeff[k,:] - 1/ntry * np.sum(all_coeff,axis=0)
-    se_arr += ser**2
-se_arr /= ntry-1
-se_arr = np.sqrt(se_arr)
-
+desc = df.describe(percentiles=[0.05,0.95])
 
 print("---------------")
 print("Boostrapped coefficient C in PI1 = C PI5")
-print("Lower bound::Value::Upper bound::Error")
-Cexp = np.mean(all_coeff)
-print(f'{Cexp-se_arr[0]:.3}',f'{Cexp:.3}',f'{Cexp + se_arr[0]:.3}',f'{se_arr[0]:.3}')
+print("Lower bound::Value::Upper bound::Min error::Max error")
+Cexp = desc.loc['mean'][0]
+Cmin = desc.loc['5%'][0]
+Cmax = desc.loc['95%'][0]
+print(f'{Cmin:.3}',f'{Cexp:.3}',f'{Cmax:.3}',f'{Cexp-Cmin:.3}',f'{Cmax-Cexp:.3}')
 
 print("---------------")
 print("STATISTICS: R2 AND AVERAGE ERROR")
