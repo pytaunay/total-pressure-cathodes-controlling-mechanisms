@@ -16,8 +16,8 @@ under a CC-BY-4.0 license.
 
 #### Re-creating numerical results
 To re-create the numerical results, run the scripts that are located in the ./article folder. 
-Scripts are provided by paper section. 
-A docstring is provided at the top of each script (below the license) to provide more context. 
+Scripts are organized by paper section. 
+Each script has a docstring below the license to provide more context. 
 The scripts may be run directly on a given machine or through the provided 
 [Singularity](https://sylabs.io/) container.
 
