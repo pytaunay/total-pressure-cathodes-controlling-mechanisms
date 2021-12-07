@@ -36,7 +36,7 @@ from sklearn.linear_model import LinearRegression
 ########################################
 ############# GET DATA #################
 ########################################
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../../data/cathode_database.h5",key="data")
 pidata = data[['PI1','PI2','PI3','PI4','PI5','PI6','PI7']].dropna()
 PI1 = np.array(pidata['PI1'])
 Y = np.log10(PI1)
@@ -90,9 +90,11 @@ for niter in range(NITER):
         rand_results[idx-1,1] += ave_err
     
 # Recreate 'Iteration 1' in Table III
+print("ITERATION 1")
+print("Reference",0.98,22.7) 
 print("Perturbed Pi-product,R^2,Average error (%)")
 for idx in np.arange(1,7):
-    print(idx+1,rand_results[idx-1,0]/NITER,rand_results[idx-1,1]/NITER)    
+    print(idx+1,f'{rand_results[idx-1,0]/NITER:.3}',f'{rand_results[idx-1,1]/NITER:.3}')    
 
 #### Iteration 2: REMOVE PI3 AND PI6
 print("-----")
@@ -118,8 +120,9 @@ P_model = np.array(P_model[['magneticPressure']])[:,0]
 P_model *= 10**Yp
 
 vec_err =  np.abs((P_xp-P_model)/P_xp)* 100
+print("ITERATION 2")
 print("New R-squared and average error (%)")
-print("Reference",r2_score(Y,Yp),np.mean(vec_err))
+print("Reference",f'{r2_score(Y,Yp):.3}',f'{np.mean(vec_err):.3}')
 
 # Iteration 2
 rand_results = np.zeros((4,2))
@@ -158,4 +161,4 @@ for niter in range(NITER):
 pilist = ["PI2","PI4","PI5","PI7"]
 print("Perturbed Pi-product,R^2,Average error (%)")
 for idx in np.arange(0,4):
-    print(pilist[idx],rand_results[idx,0]/NITER,rand_results[idx,1]/NITER)              
+    print(pilist[idx],f'{rand_results[idx,0]/NITER:.3}',f'{rand_results[idx,1]/NITER:.3}')
