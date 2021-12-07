@@ -43,7 +43,7 @@ from theoretical_model_estimator import TheoreticalModelEstimator
 ########################################
 ############# GET DATA #################
 ########################################
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../data/cathode_database.h5",key="data")
 
 ### Grab the Pi products
 pidata = data[['PI1','PI2','PI3','PI4','PI5','PI6']].dropna()
@@ -208,8 +208,9 @@ se_arr /= ntry-1
 se_arr = np.sqrt(se_arr)
 
 
-print("---------------")
 expr = "PI1 =  1/4 - log(PI2) + c0 PI5 + c1 (1/PI2^2-1) PI2^c2 PI3^c3 PI4^c4 PI6^c6"
+print("---------------")
+print("TABLE V: Coefficients for the cross-validated theoretical form and associated 95% confidence interval as computed with the bootstrap method")
 print("Boostrapped coefficients C in " + expr)
 boot_desc = df.describe(percentiles=[0.05,0.95])
 
@@ -228,9 +229,3 @@ for c in boot_desc.columns:
     
     print(c_str,":",f'{cmin:.3}',f'{cmean:.3}',f'{cmax:.3}')
 
-    
-
-print("---------------")
-print("STATISTICS: R2 AND AVERAGE ERROR")
-print("R^2 \t Average error (%)")
-print(np.mean(r2_all),np.mean(ave_err_all))
