@@ -131,7 +131,7 @@ class PowerLawEstimator(BaseEstimator):
 ########################################
 ############# GET DATA #################
 ########################################
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../../data/cathode_database.h5",key="data")
 
 ### Grab the Pi products
 pidata = data[['PI1','PI2','PI3','PI4','PI5','PI6','PI7']].dropna()
@@ -199,7 +199,7 @@ for npi_max in [1,2,3,4]:
     print(r2_score(y,Yp),np.mean( np.abs(Yp-y)/y)*100.)
     print("---------------")
     print("Power law coefficients")
-    print("Pi-product","Value")
+    print("Pi-product coefficient (beta)","Value")
     coef = np.zeros_like(mask,dtype=np.float64)
     
     idx = 0
@@ -212,15 +212,15 @@ for npi_max in [1,2,3,4]:
     all_coef[0] = reg.intercept_
     all_coef[1:] = np.copy(coef)
     
+    idx = 0
     for c in all_coef:
         if idx == 0:
-            pi_str = "C"
+            pi_str = "beta0"
             idx = 2
         else:
-            pi_str = "Pi" + str(idx)
+            pi_str = "Pi" + str(idx) + " (beta" + str(idx-1) + ")"
             idx = idx + 1
         
         print(pi_str,":",f'{c:.3}')
-        
-#    plt.loglog(Yp,y,'o')
-    
+
+
