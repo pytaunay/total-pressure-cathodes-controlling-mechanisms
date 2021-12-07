@@ -31,6 +31,11 @@ from lmfit import Model, Parameters
 from sympy import lambdify
 from sympy.parsing.sympy_parser import parse_expr
 
+# Filter some warnings
+import warnings                                                                                     
+warnings.simplefilter("ignore", UserWarning)                                                        
+warnings.simplefilter("ignore", RuntimeWarning) 
+
 
 class TheoreticalModelEstimator(BaseEstimator):
     '''
