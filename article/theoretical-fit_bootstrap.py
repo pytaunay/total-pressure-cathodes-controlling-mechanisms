@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 '''
-File: theory_fit_bootstrap.py
+File: theoretical-fit_boostrap.py
 Date: July, 2021
 Author: Pierre-Yves Taunay
 Description: Performs a bootstrap analysis to find the 95% confidence intervals for:
@@ -38,7 +38,7 @@ from random import choices
 from sklearn.utils.validation import check_X_y
 from sklearn.metrics import mean_squared_error, r2_score
 
-from theoretical-fit_xvalidated-selection import TheoryModelEstimator 
+from theoretical_model_estimator import TheoreticalModelEstimator 
 
 ########################################
 ############# GET DATA #################
@@ -87,7 +87,7 @@ icdf_single.loc[-1] = [*mask,*rdv]  # adding a row
 icdf_single.index = icdf_single.index + 1  # shifting index
 icdf_single = icdf_single.sort_index()  # sorting by index
         
-main_reg = TheoryModelEstimator(icdf_single,*mask,icidx=0)
+main_reg = TheoreticalModelEstimator(icdf_single,*mask,icidx=0)
 
 X, y = check_X_y(Xtrain, Ytrain, accept_sparse=True)
 main_reg.fit(Xtrain,Ytrain)
@@ -109,6 +109,10 @@ Yp_main = main_reg.predict(Xtrain)
 #########################################
 ############## BOOTSTRAP ################
 #########################################
+import warnings                                                                                     
+warnings.simplefilter("ignore", UserWarning)                                                        
+warnings.simplefilter("ignore", RuntimeWarning) 
+
 nsamples = len(Ytrain)
 ntry = 10000
 
@@ -121,7 +125,7 @@ mse_all = np.zeros_like(r2_all)
 ave_err_all = np.zeros_like(r2_all)
 
 # Redefine the regression
-reg = TheoryModelEstimator(icdf_single,*mask,icidx=0)
+reg = TheoreticalModelEstimator(icdf_single,*mask,icidx=0)
 
 
 # Dataframe to store each result
@@ -176,6 +180,9 @@ for k in range(ntry):
 # Create a dataframe out of the list of dictionaries
 df = pd.DataFrame(ldic,columns=range(len(Ytrain)))
 
+########################################
+############ OUTPUT INFO ###############
+########################################
 ### Plot data with bootstrapped error bounds on the Y prediction
 onetone = np.logspace(0,5,100)
 plt.loglog(onetone,onetone,'k--')
@@ -200,7 +207,30 @@ for k in range(ntry):
 se_arr /= ntry-1
 se_arr = np.sqrt(se_arr)
 
-print(se_arr)
-print(main_coeff + se_arr)
-print(main_coeff - se_arr)
 
+print("---------------")
+expr = "PI1 =  1/4 - log(PI2) + c0 PI5 + c1 (1/PI2^2-1) PI2^c2 PI3^c3 PI4^c4 PI6^c6"
+print("Boostrapped coefficients C in " + expr)
+boot_desc = df.describe(percentiles=[0.05,0.95])
+
+print("Coefficient","Lower bound","Value","Upper bound")
+idx = 0
+for c in boot_desc.columns:
+    c_str = "c" + str(idx)
+    idx = idx + 1
+    
+    if idx == 5:
+        idx = idx + 1
+    
+    cmin = boot_desc[c].loc['5%']
+    cmax = boot_desc[c].loc['95%']
+    cmean = boot_desc[c].loc['mean']    
+    
+    print(c_str,":",f'{cmin:.3}',f'{cmean:.3}',f'{cmax:.3}')
+
+    
+
+print("---------------")
+print("STATISTICS: R2 AND AVERAGE ERROR")
+print("R^2 \t Average error (%)")
+print(np.mean(r2_all),np.mean(ave_err_all))
