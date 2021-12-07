@@ -41,7 +41,7 @@ from sklearn.decomposition import PCA
 ########################################
 ############# GET DATA #################
 ########################################
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../../data/cathode_database.h5",key="data")
 pidata = data[['PI1','PI2','PI3','PI4','PI5','PI6','PI7']].dropna()
 
 PI1 = np.array(pidata['PI1'])
@@ -75,7 +75,6 @@ plt.figure()
 for name in np.unique(data[['cathode']]):
     databycathode = data[['cathode','totalPressure']].dropna()
     lPI1 = pidata[['PI1']][databycathode.cathode==name]
-#    llsq = np.array(df_lsq[df_lsq.cathode==name][['model']])
     mask = databycathode.cathode==name
     llsq = 10**Yp[mask]
     
