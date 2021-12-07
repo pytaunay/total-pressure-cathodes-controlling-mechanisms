@@ -109,7 +109,7 @@ class ExhaustiveGridSearchEstimator(BaseEstimator):
 ########################################
 ############# GET DATA #################
 ########################################
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../../data/cathode_database.h5",key="data")
 
 ### Grab the Pi products
 pidata = data[['PI1','PI2','PI3','PI4','PI5','PI6','PI7']].dropna()
@@ -176,6 +176,7 @@ plt.figure()
 plt.loglog(10**Yp,10**y,'ko')
 onetone = np.logspace(0,5,100)
 plt.loglog(onetone,onetone,'k--')
+plt.show()
 
 print("---------------")
 results_df = pd.DataFrame(clf.cv_results_)
