@@ -44,7 +44,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 ########################################
 ############# GET DATA #################
 ########################################
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../../data/cathode_database.h5",key="data")
 
 ### Grab the Pi products
 pidata = data[['PI1','PI2','PI3','PI4','PI5','PI6','PI7']].dropna()
@@ -73,7 +73,7 @@ Yp_main = main_reg.predict(np.log10(Xtrain))
 ############# BOOTSTRAP ################
 ########################################
 nsamples = len(Ytrain)
-ntry = 50000
+ntry = 1000
 
 # Placeholders for the coefficients to be found and the predicted y values
 all_coeff = np.zeros((ntry,len(main_coeff)))
@@ -176,7 +176,7 @@ for k in range(ntry):
 se_arr /= ntry-1
 se_arr = np.sqrt(se_arr)
 
-print("Pi-product","Lower bound","Value","Upper bound")
+print("Pi-product::Lower bound::Value::Upper bound")
 idx = 0
 for c, e in zip(main_coeff, se_arr):
     if idx == 0:
@@ -186,5 +186,6 @@ for c, e in zip(main_coeff, se_arr):
         pi_str = "Pi" + str(idx)
         idx = idx + 1
     
-    print(pi_str,":",f'{c-e:.3}',f'{c:.3}',f'{c+e:.3}')
+    print(pi_str,"::",f'{c-e:.3}',"::",f'{c:.3}',"::",f'{c+e:.3}')
 
+plt.show()
