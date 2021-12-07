@@ -74,9 +74,12 @@ for kk,val in enumerate(
     
 # Plot distribution of values
 _ = plt.hist(Cvec,bins=50)
+plt.xlabel("Theoretical constant")
+plt.ylabel("Counts")
 
 # Compute the mean, min, max
-tdf = pd.DataFrame(Cvec).describe(percentiles=[0.05,0.95])
+df = pd.DataFrame(Cvec)
+tdf = df.describe(percentiles=[0.05,0.95])
 
 Ctheory = tdf.loc['mean'][0]
 Cmin = tdf.loc['min'][0]
@@ -87,3 +90,7 @@ print("Lower bound, Theoretical value, Upper bound")
 print(Cmin,Ctheory,Cmax)
 print("Delta-min, Delta-max")
 print(Ctheory-Cmin,Cmax-Ctheory)
+
+df.to_csv("tmp.csv",header=["scaling_factor"],index=True,index_label="idx")
+
+plt.show()
