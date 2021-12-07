@@ -42,7 +42,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 ########################################
 ############# GET DATA #################
 ########################################
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../data/cathode_database.h5",key="data")
 
 ### Grab the Pi products
 pidata = data[['PI1','PI2','PI3','PI4','PI5','PI6']].dropna()
@@ -148,6 +148,7 @@ plt.errorbar(desc.loc['mean'],
                           desc.loc['mean']-desc.loc['5%'],
                           desc.loc['95%']-desc.loc['mean']]),fmt='ko')
 
+
 ### Get the bootstraped error for the coefficients
 df = pd.DataFrame(all_coeff)
 
@@ -162,13 +163,13 @@ se_arr = np.sqrt(se_arr)
 
 print("---------------")
 print("Boostrapped coefficient C in PI1 = C PI5")
-print("Lower bound, Value, Upper bound","Error")
+print("Lower bound::Value::Upper bound::Error")
 Cexp = np.mean(all_coeff)
-print(Cexp-se_arr,Cexp,Cexp + se_arr,se_arr)
+print(f'{Cexp-se_arr[0]:.3}',f'{Cexp:.3}',f'{Cexp + se_arr[0]:.3}',f'{se_arr[0]:.3}')
 
 print("---------------")
 print("STATISTICS: R2 AND AVERAGE ERROR")
 print("R^2 \t Average error (%)")
 print(np.mean(r2_all),np.mean(ave_err_all))
 
-    
+plt.show()
