@@ -91,6 +91,6 @@ print(Cmin,Ctheory,Cmax)
 print("Delta-min, Delta-max")
 print(Ctheory-Cmin,Cmax-Ctheory)
 
-df.to_csv("tmp.csv",header=["scaling_factor"],index=True,index_label="idx")
+df.to_csv("cvec.csv",header=["scaling_factor"],index=True,index_label="idx")
 
 plt.show()
