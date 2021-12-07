@@ -32,7 +32,7 @@ cd ./container
 # with previous versions of Singularity and Ubuntu 20.04 when running with fakeroot.
 # See https://github.com/sylabs/singularity/issues/266
 singularity build --fakeroot singularity.sif singularity.def
-# ...Or if you do
+# If you have root access, you can use sudo
 sudo singularity build singularity.sif singularity.def
 ```
 
@@ -46,8 +46,8 @@ singularity exec ../../../container/singularity.sif python3 power-law_fit.py
 
 ---
 ### License
-All software files are licensed under MIT license.
-All data files are licensed under CC-BY-4.0 license. 
+All software files (.py, .def) are licensed under MIT license.
+All data files (.h5, .csv) are licensed under CC-BY-4.0 license. 
 
 ---
 Pierre-Yves Taunay, 2021
