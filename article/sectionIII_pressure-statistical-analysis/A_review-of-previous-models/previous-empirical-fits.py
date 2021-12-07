@@ -282,6 +282,7 @@ plt.legend(["Siegfried and Wilbur",
             "Patterson and Fearn"])
 plt.xlabel("$\Gamma (\Pi)$")
 plt.ylabel("$\Pi_1$")
+plt.title("Figure 3: Comparison between $\Pi_1$ and its estimate as obtained with previous empirical models.")
 
 # Perfect correlation
 onetone = np.logspace(0,5,100)

@@ -100,6 +100,7 @@ for r,e,m in zip(R2,ave_err,model_list):
 plt.legend(["Poiseuille","Isentropic"])
 plt.xlabel("$\Gamma (\Pi)$")
 plt.ylabel("$\Pi_1$")
+plt.title("Figure 4: Comparison between $\Pi_1$ and its estimate as obtained with an isentropic and  a Poiseuille flow model")
 
 # Perfect correlation
 onetone = np.logspace(0,5,100)
