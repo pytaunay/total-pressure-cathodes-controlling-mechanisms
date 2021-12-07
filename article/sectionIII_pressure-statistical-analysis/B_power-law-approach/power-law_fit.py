@@ -160,6 +160,7 @@ vals = 1.96 * np.sqrt(np.diag(Ainv))
 
 ### Coefficient error: Table II
 print("---------------")
+print("Table II: Power law coefficients and associated 95% confidence interval.")
 print("Pi-product::Lower bound::Value::Upper bound")
 idx = 0
 for c, e in zip(coef, vals):
