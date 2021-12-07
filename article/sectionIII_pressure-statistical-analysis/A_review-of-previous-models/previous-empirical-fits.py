@@ -49,7 +49,7 @@ from lmfit import Model, Parameters
 ########################################
 ############# GET DATA #################
 ########################################
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../../data/cathode_database.h5",key="data")
 
 ### Grab the Pi products
 sw_data = data[['PI1','totalPressure_SI','massFlowRate','massFlowRate_SI','gasMass','orificeDiameter','dischargeCurrent','magneticPressure']].dropna()

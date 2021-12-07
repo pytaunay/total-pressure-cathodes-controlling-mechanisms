@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import r2_score
 
-data = pd.read_hdf("cathode_database.h5",key="data")
+data = pd.read_hdf("../../../data/cathode_database.h5",key="data")
 pidata = data[['PI1','PI2','PI3','PI4','PI5','PI6','PI7']].dropna()
 
 gam = 5./3.
