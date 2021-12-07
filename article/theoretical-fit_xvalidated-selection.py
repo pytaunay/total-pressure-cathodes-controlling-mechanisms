@@ -1,6 +1,6 @@
 # MIT License
 # 
-# Copyright (c) 2020-2021 Pierre-Yves Taunay 
+# Copyright (c) 2021 Pierre-Yves Taunay 
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 '''
-File: theory_model_selection.py
-Date: 2021
+File: theoretical-fit_xvalidated-selection.py
+Date: August, 2021
 Author: Pierre-Yves Taunay
 
 Description: perform a grid-search on all possible combination of Pi-products to find the one
@@ -30,7 +30,8 @@ form:
     1/4 - log(PI2) + c0 * PI5 + 
     c1 * (1/PI2**2-1) * PI2**c2 * PI3**c3 * PI4**c4 * PI5**c5 * PI6**c6
 
-The grid search is cross-validated with a k-fold approach with 10 folds
+The grid search is cross-validated with a k-fold approach with 10 folds and multiple initial
+conditions that are pre-computed.
 
 '''
 import numpy as np
@@ -46,7 +47,6 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator
 from sklearn.metrics import mean_squared_error, r2_score
 
-import lmfit
 from lmfit import Model, Parameters
 
 from sympy import lambdify
@@ -228,7 +228,6 @@ class TheoryModelEstimator(BaseEstimator):
         mlist = []
         for kk in range(X.shape[1]):
             mlist.append(1.0)
-#             mlist.append(np.mean(X[:,kk]))
         
         # Extract variables
         x0 = X[:,0]
@@ -237,11 +236,15 @@ class TheoryModelEstimator(BaseEstimator):
         x3 = X[:,3]
         x4 = X[:,4]
                 
+        # Predicted Y using PI2-PI6 and the coefficients
         Yp = self.func_(x0,x1,x2,x3,x4,*alist,*mlist)
 
         return Yp
 
     def score(self, X,y):
+        '''
+        Scoring function. We use the AIC as computed by the estimator itself.
+        '''
         X, y = check_X_y(X, y, accept_sparse=True,copy=True)
         y = np.log10(y)
         
@@ -255,14 +258,81 @@ class TheoryModelEstimator(BaseEstimator):
 
         self.mse_ = mean_squared_error(y,ypred)
         
-#        aic = 2*self.n_parameters + nsamples * np.log(self.mse_)
         aic = self.fit_.aic
 
         if np.isnan(aic):
-            raise("NAN AIC")
             print(self.n_parameters,nsamples,self.mse_)
         
         return -aic
+
+def build_initial_conditions(pidata,nc):
+    m2list = [True,False]
+    m3list = [True,False]
+    m4list = [True,False]
+    m5list = [True,False]
+    m6list = [True,False]
+    
+    Ytrain = pidata['PI1']
+    Xtrain = pidata[['PI2','PI3','PI4','PI5','PI6']]
+    ctest = np.linspace(cmin,cmax,nc)
+
+    
+    icdf = pd.DataFrame(columns=['m2','m3','m4','m5','m6','p0','p1','p2','p3','p4','p5','p6'])
+    nparam = 7
+    print("=========================")
+    print("BUILDING INITIAL CONDITIONS")
+    for x in product(m2list,m3list,m4list,m5list,m6list):
+        mask = list(x)
+        
+        for z in range(nc):
+            rdv = np.zeros(nparam)
+       
+            ### Grab the C to test            
+            Ctheory = ctest[z]
+            
+            ### Figure out the initial point
+            # 1. Compute PI1 - (1/4 - log(PI2) - eta_0 * PI5)
+            ylin = Ytrain - (1/4 - np.log(Xtrain['PI2']) + Ctheory * Xtrain['PI5'])
+            ylin = np.abs(ylin) / (Xtrain['PI2']**(-2)-1)
+    
+    
+            if(any(ylin < 0.0)):
+                raise
+            
+            # 2. Perform linear regression to get an idea of the initial values
+            linreg = LinearRegression()
+            Xlin, ylin = check_X_y(Xtrain, ylin, accept_sparse=True,copy=True)
+            Xlin = Xlin[:,mask]
+    
+    
+            
+            if Xlin.shape[1] > 0:
+                linreg.fit(np.log10(Xlin),np.log10(ylin))
+       
+            # 3. Fill the initial values
+            rdv[0] = Ctheory
+            if(any(mask)):
+                rdv[1] = 10**linreg.intercept_
+                
+                idxcoeff = 0
+                
+                for kk,v in enumerate(mask):
+                    if v:
+                        rdv[kk+2] = linreg.coef_[idxcoeff]
+                        idxcoeff = idxcoeff + 1
+                    else:
+                        rdv[kk+2] = 0.0
+            
+            if(any(Xtrain['PI2']) < 0.0):
+                raise
+            
+            # Insert into the initial condition dataframe        
+            icdf.loc[-1] = [*mask,*rdv]  # adding a row
+            icdf.index = icdf.index + 1  # shifting index
+            icdf = icdf.sort_index()  # sorting by index
+    
+    print("DONE.")
+    return icdf
 
 ########################################
 ############# GET DATA #################
@@ -295,74 +365,10 @@ cmin = scaling_factor.min()['scaling_factor']
 cmax = scaling_factor.max()['scaling_factor']
 
 nc = 20
-ctest = np.linspace(cmin,cmax,nc)
 
+icdf = build_initial_conditions(pidata,nc)
 
-m2list = [True,False]
-m3list = [True,False]
-m4list = [True,False]
-m5list = [True,False]
-m6list = [True,False]
-#
-#icdf = pd.DataFrame(columns=['m2','m3','m4','m5','m6','p0','p1','p2','p3','p4','p5','p6'])
-#nparam = 7
-#print("BUILDING INITIAL CONDITIONS")
-#for x in product(m2list,m3list,m4list,m5list,m6list):
-#    mask = list(x)
-#    
-#    for z in range(nc):
-#        rdv = np.zeros(nparam)
-#   
-#        ### Grab the C to test            
-#        Ctheory = ctest[z]
-#        
-#        ### Figure out the initial point
-#        # 1. Compute PI1 - (1/4 - log(PI2) - eta_0 * PI5)
-#        ylin = Ytrain - (1/4 - np.log(Xtrain['PI2']) + Ctheory * Xtrain['PI5'])
-#        ylin = np.abs(ylin) / (Xtrain['PI2']**(-2)-1)
-#
-#
-#        if(any(ylin < 0.0)):
-#            raise
-#        
-#        # 2. Perform linear regression to get an idea of the initial values
-#        linreg = LinearRegression()
-#        Xlin, ylin = check_X_y(Xtrain, ylin, accept_sparse=True,copy=True)
-#        Xlin = Xlin[:,mask]
-#
-#
-#        
-#        if Xlin.shape[1] > 0:
-#            linreg.fit(np.log10(Xlin),np.log10(ylin))
-#   
-#        # 3. Fill the initial values
-#        rdv[0] = Ctheory
-#        if(any(mask)):
-#            rdv[1] = 10**linreg.intercept_
-#            
-#            idxcoeff = 0
-#            
-#            for kk,v in enumerate(mask):
-#                if v:
-#                    rdv[kk+2] = linreg.coef_[idxcoeff]
-#                    idxcoeff = idxcoeff + 1
-#                else:
-#                    rdv[kk+2] = 0.0
-#        
-#        if(any(Xtrain['PI2']) < 0.0):
-#            raise
-#        
-#        # Insert into the initial condition dataframe        
-#        icdf.loc[-1] = [*mask,*rdv]  # adding a row
-#        icdf.index = icdf.index + 1  # shifting index
-#        icdf = icdf.sort_index()  # sorting by index
-#
-#print("DONE.")
-
-#import warnings
-#warnings.simplefilter("ignore", UserWarning)
-#warnings.simplefilter("ignore", RuntimeWarning)
-
+print("=========================")
 print("CROSS VALIDATION")
 parameters = {
         'm2':[True,False],
@@ -386,31 +392,31 @@ clf = GridSearchCV(
 
 clf.fit(Xtrain,Ytrain)
 
-print(clf.best_score_,clf.best_params_)
-#print("===================")
-#print("PARAMETER CONFIDENCE INTERVAL")
-#print(lmfit.fit_report(clf.best_estimator_.fit_))
-#print("===================")
-#try:
-#    print(clf.best_estimator_.fit_.ci_report())
-#except:
-#    print("Cannot determine confidence intervals with LMFIT.")
-#    
-#print("===================")
-#
-#
-## Redo regression
-#X, y = check_X_y(Xtrain,np.log10(Ytrain), accept_sparse=True,copy=True)
-#Yp = clf.best_estimator_.predict(X)
-#
-#print("MSE, R2")
-#print(mean_squared_error(y,Yp),r2_score(y,Yp))
-#print("Average error (%):",np.mean(np.abs(10**Yp-10**y)/10**y)*100.)
-#
-#plt.loglog(10**Yp,10**y,'o')
-#onetone = np.logspace(0,5,100)
-#plt.loglog(onetone,onetone,'k--')
-#
-#cvdf = pd.DataFrame(clf.cv_results_)
-#cvdf = cvdf.sort_values(by=['rank_test_score'])
+print("Best AIC score:", clf.best_score_)
+print("Best parameters:",clf.best_params_)
+
+########################################
+############ OUTPUT INFO ###############
+########################################
+# Redo regression using the best estimator
+X, y = check_X_y(Xtrain,np.log10(Ytrain), accept_sparse=True,copy=True)
+Yp = clf.best_estimator_.predict(X)
+print("=========================")
+print("STATISTICS: R2 AND AVERAGE ERROR")
+print("R^2 \t Average error (%)")
+print("MSE, R2")
+print(r2_score(y,Yp),np.mean(np.abs(10**Yp-10**y)/10**y)*100.)
+
+# Plot
+plt.loglog(10**Yp,10**y,'ko',markerfacecolor='none')
+plt.xlabel("$\Gamma (\Pi)$")
+plt.ylabel("$\Pi_1$")
+plt.title("Figure 9b: Theoretically derived expressions applied to the entire experimental dataset.")
+
+onetone = np.logspace(0,5,100)
+plt.loglog(onetone,onetone,'k--')
+
+### Gather info about all of the cross-validated results
+cvdf = pd.DataFrame(clf.cv_results_)
+cvdf = cvdf.sort_values(by=['rank_test_score'])
 
