@@ -161,7 +161,7 @@ vals = 1.96 * np.sqrt(np.diag(Ainv))
 
 ### Coefficient error: Table II
 print("---------------")
-print("Pi-product","Lower bound","Value","Upper bound")
+print("Pi-product::Lower bound::Value::Upper bound")
 idx = 0
 for c, e in zip(coef, vals):
     if idx == 0:
@@ -171,7 +171,7 @@ for c, e in zip(coef, vals):
         pi_str = "Pi" + str(idx)
         idx = idx + 1
     
-    print(pi_str,":",f'{c-e:.3}',f'{c:.3}',f'{c+e:.3}')
+    print(pi_str,"::",f'{c-e:.3}',"::",f'{c:.3}',"::",f'{c+e:.3}')
 
 ########################################
 ########## ERROR HISTOGRAM #############
@@ -209,7 +209,7 @@ logprob = kde.score_samples(x_d[:,None])
 plt.figure()
 plt.plot(x_d,np.exp(logprob),'k-')
 plt.fill_between(x_d,np.exp(logprob),color='tab:gray')
-_ = plt.hist(vec_err,bins=40,normed=True,histtype='step',color='k')
+_ = plt.hist(vec_err,bins=40,density=True,histtype='step',color='k')
 
 plt.title("Figure 6: Pressure error histogram and KDE")
 plt.xlabel("Pressure error (%)")
@@ -232,4 +232,4 @@ plt.title("Figure 7: Principal Component Analysis")
 plt.xlabel("Dimensions")
 plt.ylabel("Explained variance")
 
-
+plt.show()
