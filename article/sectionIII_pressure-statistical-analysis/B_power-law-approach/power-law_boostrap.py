@@ -176,6 +176,7 @@ for k in range(ntry):
 se_arr /= ntry-1
 se_arr = np.sqrt(se_arr)
 
+print("Table II: Power law coefficients and associated 95% confidence interval.")
 print("Pi-product::Lower bound::Value::Upper bound")
 idx = 0
 for c, e in zip(main_coeff, se_arr):
@@ -187,5 +188,6 @@ for c, e in zip(main_coeff, se_arr):
         idx = idx + 1
     
     print(pi_str,"::",f'{c-e:.3}',"::",f'{c:.3}',"::",f'{c+e:.3}')
+print("Values are similar to the ones obtained with the covariance method.")
 
 plt.show()
