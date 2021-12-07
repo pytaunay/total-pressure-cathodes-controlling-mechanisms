@@ -27,7 +27,10 @@ The container must first be built:
 
 ```bash
 cd ./container
-# If you do not have root access...
+# If you do not have root access, use either fakeroot or remote options. See Singularity docs
+# The command below was tested with Singularity 3.8.4 on Ubuntu 20.04. There seems to be an issue 
+# with previous versions of Singularity and Ubuntu 20.04 when running with fakeroot.
+# See https://github.com/sylabs/singularity/issues/266
 singularity build --fakeroot singularity.sif singularity.def
 # ...Or if you do
 sudo singularity build singularity.sif singularity.def
