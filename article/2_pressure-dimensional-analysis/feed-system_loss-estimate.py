@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 '''
-File: poiseuille_feed_drop.py
+File: feed-system_loss-estimate.py
 Date: December, 2021
 Author: Pierre-Yves Taunay
 
