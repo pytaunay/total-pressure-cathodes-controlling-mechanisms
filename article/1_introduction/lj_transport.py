@@ -26,7 +26,8 @@ Author: Pierre-Yves Taunay
 Date: June 2020
 
 This file contains functions to calculate transport properties assuming a
-Lennard-Jones 12-6 interatomic potential.
+Lennard-Jones 12-6 interatomic potential. The file was originally defined in the "cathode-database"
+repository (doi: 10.5281/zenodo.3956853, https://github.com/eppdyl/cathode-database)  
 '''
 
 import numpy as np
