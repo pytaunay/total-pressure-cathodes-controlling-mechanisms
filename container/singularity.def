@@ -24,7 +24,7 @@ From: ubuntu:21.04
         python3-setuptools
 
     # Install Python packages
-    pip3 install pandas tables numpy sympy matplotlib lmfit sklearn 
+    pip3 install pandas tables numpy sympy matplotlib lmfit scikit-learn 
 
     # When did we build this?
     NOW=`date`
