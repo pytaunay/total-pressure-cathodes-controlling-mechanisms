@@ -42,7 +42,7 @@ The container environment is now setup and the required Python packages are down
 scripts can then be run through the container 
 
 ```bash
-cd ../article/sectionIII_pressure-statistical-analysis/B_power-law-approach/
+cd ../article/3_pressure-statistical-analysis/B_power-law-approach/
 singularity exec ../../../container/singularity.sif python3 power-law_fit.py
 ``` 
 
